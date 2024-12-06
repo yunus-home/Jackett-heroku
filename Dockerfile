@@ -23,7 +23,9 @@ RUN apt-get update && \
         jq \
         libicu66 \
         wget \
-        curl && \
+        curl \
+        ca-certificates && \
+    update-ca-certificates && \
     echo "**** Installing Jackett ****" && \
     mkdir -p /app/Jackett && \
     if [ -z ${JACKETT_RELEASE+x} ]; then \
