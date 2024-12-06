@@ -10,8 +10,7 @@ LABEL build_version="Linuxserver.io version:- ${VERSION} Build-date:- ${BUILD_DA
 LABEL maintainer="thelamer"
 
 # environment settings
-ARG 
-DEBIAN_FRONTEND="noninteractive"
+ARG DEBIAN_FRONTEND="noninteractive"
 ENV XDG_DATA_HOME="/config" \
 XDG_CONFIG_HOME="/config" \
 PORT=9117
