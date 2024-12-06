@@ -1,5 +1,5 @@
 # Use a compatible base image
-FROM ghcr.io/linuxserver/baseimage-ubuntu:22.04
+FROM ghcr.io/linuxserver/baseimage-ubuntu:bionic
 
 # Set working directory
 WORKDIR /app
