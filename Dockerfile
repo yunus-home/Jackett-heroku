@@ -1,5 +1,5 @@
 # Use a compatible base image
-FROM ghcr.io/linuxserver/baseimage-ubuntu:bionic
+FROM ubuntu:20.04
 
 # Set working directory
 WORKDIR /app
@@ -8,7 +8,7 @@ WORKDIR /app
 ARG BUILD_DATE
 ARG VERSION
 ARG JACKETT_RELEASE
-LABEL build_version="Linuxserver.io version:- ${VERSION} Build-date:- ${BUILD_DATE}"
+LABEL build_version="Render-compatible version: ${VERSION} Build-date: ${BUILD_DATE}"
 LABEL maintainer="thelamer"
 
 # Environment variables
@@ -19,9 +19,9 @@ ENV DEBIAN_FRONTEND="noninteractive" \
 
 # Install dependencies and Jackett
 RUN apt-get update && \
-    apt-get install -y \
+    apt-get install -y --no-install-recommends \
         jq \
-        libicu70 \
+        libicu66 \
         wget \
         curl && \
     echo "**** Installing Jackett ****" && \
@@ -35,11 +35,12 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/*
 
-# Copy configuration files if needed
-COPY ./config /config
+# Add a non-root user for security
+RUN useradd -u 10001 -m -d /config jackettuser && \
+    chown -R jackettuser:jackettuser /app /config
 
-# Set the container to run as a non-root user using base image's default user
-USER 911
+# Switch to the non-root user
+USER jackettuser
 
 # Expose the application port
 EXPOSE 9117
