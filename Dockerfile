@@ -26,20 +26,28 @@ RUN apt-get update && \
     ca-certificates \
     openjdk-11-jre-headless && \
     echo "**** install Jackett ****" && \
-    JACKETT_RELEASE=${JACKETT_RELEASE:-$(curl -sX GET "https://api.github.com/repos/Jackett/Jackett/releases/latest" | jq -r .tag_name)} && \
-    curl -o /tmp/jacket.tar.gz -L "https://github.com/Jackett/Jackett/releases/download/${JACKETT_RELEASE}/Jackett.Binaries.LinuxAMDx64.tar.gz" && \
     mkdir -p /app/Jackett && \
-    tar xf /tmp/jacket.tar.gz -C /app/Jackett --strip-components=1 && \
+    JACKETT_RELEASE=${JACKETT_RELEASE:-$(curl -s "https://api.github.com/repos/Jackett/Jackett/releases/latest" | jq -r .tag_name)} && \
+    echo "Resolved Jackett release: ${JACKETT_RELEASE}" && \
+    curl -fLo /tmp/jacket.tar.gz "https://github.com/Jackett/Jackett/releases/download/${JACKETT_RELEASE}/Jackett.Binaries.LinuxAMDx64.tar.gz" && \
+    if ! tar xf /tmp/jacket.tar.gz -C /app/Jackett --strip-components=1; then \
+        echo "Error: Jackett archive extraction failed"; \
+        cat /tmp/jacket.tar.gz; \
+        exit 1; \
+    fi && \
     chown -R root:root /app/Jackett && \
     echo "**** install FlareSolverr ****" && \
-    curl -o /tmp/flaresolverr.tar.gz -L "https://github.com/FlareSolverr/FlareSolverr/releases/latest/download/flaresolverr-linux-x64.tar.gz" && \
     mkdir -p /app/FlareSolverr && \
-    tar xf /tmp/flaresolverr.tar.gz -C /app/FlareSolverr --strip-components=1 && \
+    curl -fLo /tmp/flaresolverr.tar.gz "https://github.com/FlareSolverr/FlareSolverr/releases/latest/download/flaresolverr-linux-x64.tar.gz" && \
+    if ! tar xf /tmp/flaresolverr.tar.gz -C /app/FlareSolverr --strip-components=1; then \
+        echo "Error: FlareSolverr archive extraction failed"; \
+        cat /tmp/flaresolverr.tar.gz; \
+        exit 1; \
+    fi && \
     chmod +x /app/FlareSolverr/flaresolverr && \
     rm -rf /tmp/jacket.tar.gz /tmp/flaresolverr.tar.gz && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /var/tmp/*
-
 # Expose ports for Jackett and FlareSolverr
 EXPOSE 9117 8191
 
